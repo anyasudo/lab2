@@ -1,8 +1,11 @@
 #include "car.hpp"
+#include <algorithm>
+#include <random>
+#include <chrono>
 
 namespace mt {
 
-    // проверка гос номера 
+    // проверка гос номера
     bool Car::check_license_format_(const std::string& plate) const {
         if (plate.length() != 6) {
             return false;
@@ -43,28 +46,43 @@ namespace mt {
         return first_ok && digits_ok && last_ok;
     }
 
+    // генерация случайного госномера
+    std::string Car::generate_random_plate_() const {
+        static const std::string letters = "АВЕКМНОРСТУХ";
+        static std::mt19937 rng(std::chrono::steady_clock::now().time_since_epoch().count());
+        static std::uniform_int_distribution<int> letter_dist(0, letters.size() - 1);
+        static std::uniform_int_distribution<int> digit_dist(0, 9);
+
+        std::string plate;
+
+        // до тех пор пока не получим валидный
+        do {
+            plate.clear();
+            plate += letters[letter_dist(rng)];  // первая буква
+            plate += std::to_string(digit_dist(rng));  // первая цифра
+            plate += std::to_string(digit_dist(rng));  // вторая цифра
+            plate += std::to_string(digit_dist(rng));  // третья цифра
+            plate += letters[letter_dist(rng)];  // четвертая буква
+            plate += letters[letter_dist(rng)];  // пятая буква
+        } while (!check_license_format_(plate));
+
+        return plate;
+    }
+
     // конструктор по умолчанию
     Car::Car() : brand_("Неизвестно"), model_("Неизвестно"),
-        body_number_("000000"), license_plate_("А000АА"),
-        mileage_(0) {
-
-        mileage_history_ = new std::vector<int>();
-        mileage_history_->push_back(0); // начальный пробег
+        license_plate_("А000АА") {
         std::cerr << "Вызван конструктор по умолчанию" << std::endl;
     }
 
     // конструктор полного заполнения
     Car::Car(const std::string& brand, const std::string& model,
-        const std::string& body_number, const std::string& license_plate,
-        int mileage) :
-        brand_(brand), model_(model), body_number_(body_number),
-        license_plate_(license_plate), mileage_(mileage) {
+        const std::string& license_plate,
+        const std::vector<std::string>& trunk_items) :
+        brand_(brand), model_(model), license_plate_(license_plate),
+        trunk_items_(trunk_items) {
 
-        if (!is_mileage_valid_(mileage)) {
-            throw std::invalid_argument("Пробег должен быть неотрицательным");
-        }
-
-        // проверка гос номера
+        // проверка гос. номера
         if (!check_license_format_(license_plate)) {
             throw std::invalid_argument(
                 "Гос. номер должен быть в формате: БУКВА + 3 ЦИФРЫ + 2 БУКВЫ\n"
@@ -72,22 +90,14 @@ namespace mt {
                 "Пример: А123ВС, М456ОР, Х789ТУ");
         }
 
-        mileage_history_ = new std::vector<int>();
-        mileage_history_->push_back(mileage); // начальный пробег
-
         std::cerr << "Вызван конструктор с параметрами" << std::endl;
-        show_protected_info_();
     }
 
     // конструктор копирования
     Car::Car(const Car& other) :
         brand_(other.brand_), model_(other.model_),
-        body_number_(other.body_number_),
         license_plate_(other.license_plate_),
-        mileage_(other.mileage_) {
-
-        // глубокое копирование динамического поля
-        mileage_history_ = new std::vector<int>(*other.mileage_history_);
+        trunk_items_(other.trunk_items_) {
 
         std::cerr << "Вызван конструктор копирования" << std::endl;
     }
@@ -96,16 +106,11 @@ namespace mt {
     Car& Car::operator=(const Car& other) {
         std::cerr << "Вызван оператор присваивания" << std::endl;
 
-        if (this != &other) { // защита от самоприсваивания
+        if (this != &other) {
             brand_ = other.brand_;
             model_ = other.model_;
-            body_number_ = other.body_number_;
             license_plate_ = other.license_plate_;
-            mileage_ = other.mileage_;
-
-            delete mileage_history_;
-
-            mileage_history_ = new std::vector<int>(*other.mileage_history_);
+            trunk_items_ = other.trunk_items_;
         }
 
         return *this;
@@ -113,22 +118,10 @@ namespace mt {
 
     // деструктор
     Car::~Car() {
-        // Очистка динамического поля перед выводом сообщения
-        if (mileage_history_ != nullptr) {
-            mileage_history_->clear(); // очистка вектора
-            delete mileage_history_;   // освобождение памяти
-            mileage_history_ = nullptr;
-        }
-
         std::cerr << "Вызван деструктор для " << brand_ << " " << model_ << std::endl;
     }
 
-    // сеттер для номера кузова
-    void Car::set_body_number(const std::string& body_number) {
-        body_number_ = body_number;
-    }
-
-    // сеттер для гос. номера с проверкой 
+    // сеттер для гос. номера с проверкой
     void Car::set_license_plate(const std::string& license_plate) {
         if (!check_license_format_(license_plate)) {
             throw std::invalid_argument(
@@ -146,35 +139,107 @@ namespace mt {
         std::cout << "=== Информация об автомобиле ===" << std::endl;
         std::cout << "Марка: " << brand_ << std::endl;
         std::cout << "Модель: " << model_ << std::endl;
-        std::cout << "Номер кузова: " << body_number_ << std::endl;
         std::cout << "Гос. номер: " << license_plate_ << std::endl;
-        std::cout << "Пробег: " << mileage_ << " км" << std::endl;
-        std::cout << "================================" << std::endl;
+        std::cout << "Вещи в багажнике (" << trunk_items_.size() << "): ";
+
+        if (trunk_items_.empty()) {
+            std::cout << "багажник пуст";
+        }
+        else {
+            for (size_t i = 0; i < trunk_items_.size(); ++i) {
+                std::cout << trunk_items_[i];
+                if (i < trunk_items_.size() - 1) {
+                    std::cout << ", ";
+                }
+            }
+        }
+        std::cout << std::endl << "================================" << std::endl;
     }
 
-    // метод для скручивания пробега на X
-    void Car::rollback_mileage(int x) {
-        if (x < 0) {
-            throw std::invalid_argument("Значение скручивания должно быть неотрицательным");
-        }
-
-        if (mileage_ - x < 0) {
-            throw std::invalid_argument("Нельзя скрутить больше, чем текущий пробег");
-        }
-
-        mileage_ -= x;
-        mileage_history_->push_back(mileage_); // в историю
-        std::cout << "Пробег уменьшен на " << x << " км" << std::endl;
+    // метод для добавления вещей в багажник
+    void Car::add_to_trunk(const std::string& item) {
+        trunk_items_.push_back(item);
+        std::cout << "Добавлено в багажник: " << item << std::endl;
     }
 
-    // метод для увеличения пробега
-    void Car::drive(int distance) {
-        if (distance < 0) {
-            throw std::invalid_argument("Расстояние должно быть неотрицательным");
+    // метод для удаления вещей из багажника
+    void Car::remove_from_trunk(const std::string& item) {
+        auto it = std::find(trunk_items_.begin(), trunk_items_.end(), item);
+        if (it != trunk_items_.end()) {
+            trunk_items_.erase(it);
+            std::cout << "Удалено из багажника: " << item << std::endl;
         }
-        mileage_ += distance;
-        mileage_history_->push_back(mileage_); // в историю
-        std::cout << "Автомобиль проехал " << distance << " км" << std::endl;
+        else {
+            std::cout << "Предмет " << item << " не найден в багажнике" << std::endl;
+        }
+    }
+
+    // оператор + 
+    Car Car::operator+(const Car& other) const {
+        std::cout << "Выполняется оператор +" << std::endl;
+
+        Car result;
+
+        result.brand_ = this->brand_;
+        result.model_ = this->model_;
+
+        result.license_plate_ = generate_random_plate_();
+
+        result.trunk_items_ = this->trunk_items_;
+        result.trunk_items_.insert(result.trunk_items_.end(),
+            other.trunk_items_.begin(),
+            other.trunk_items_.end());
+
+        return result;
+    }
+
+    // оператор - 
+    Car Car::operator-(const Car& other) const {
+        std::cout << "Выполняется оператор -" << std::endl;
+
+        Car result;
+
+        result.brand_ = this->brand_;
+        result.model_ = this->model_;
+
+        result.license_plate_ = generate_random_plate_();
+
+        std::vector<std::string> all_items = this->trunk_items_;
+        all_items.insert(all_items.end(), other.trunk_items_.begin(), other.trunk_items_.end());
+
+        std::sort(all_items.begin(), all_items.end());
+        auto last = std::unique(all_items.begin(), all_items.end());
+        all_items.erase(last, all_items.end());
+
+        result.trunk_items_ = all_items;
+
+        return result;
+    }
+
+    // оператор / 
+    Car Car::operator/(const Car& other) const {
+        std::cout << "Выполняется оператор /" << std::endl;
+
+        Car result;
+
+        result.brand_ = other.brand_;
+        result.model_ = other.model_;
+
+        result.license_plate_ = generate_random_plate_();
+
+        for (const auto& item1 : this->trunk_items_) {
+            for (const auto& item2 : other.trunk_items_) {
+                if (item1 == item2) {
+                    if (std::find(result.trunk_items_.begin(), result.trunk_items_.end(), item1)
+                        == result.trunk_items_.end()) {
+                        result.trunk_items_.push_back(item1);
+                    }
+                    break;
+                }
+            }
+        }
+
+        return result;
     }
 
     // оператор сравнения == по гос номеру
@@ -189,33 +254,22 @@ namespace mt {
 
     // оператор вывода в поток
     std::ostream& operator<<(std::ostream& os, const Car& car) {
-        os << car.brand_ << " " << car.model_ << " (" << car.license_plate_ << ") - "
-            << car.mileage_ << " км";
-        return os;
-    }
+        os << "[" << car.brand_ << "," << car.license_plate_ << ",(";
 
-    // публичные методы для работы с protected данными
-    void Car::set_color(const std::string& color) {
-        car_color_ = color;
-        std::cout << "Цвет автомобиля установлен: " << car_color_ << std::endl;
-    }
-
-    void Car::show_color() const {
-        std::cout << "Цвет автомобиля: " << car_color_ << std::endl;
-    }
-
-    // метод для отображения истории пробегов
-    void Car::show_mileage_history() const {
-        std::cout << "=== История пробегов ===" << std::endl;
-        if (mileage_history_ == nullptr || mileage_history_->empty()) {
-            std::cout << "История пуста" << std::endl;
+        if (car.trunk_items_.empty()) {
+            os << "пусто";
         }
         else {
-            for (size_t i = 0; i < mileage_history_->size(); ++i) {
-                std::cout << "Запись " << (i + 1) << ": " << (*mileage_history_)[i] << " км" << std::endl;
+            for (size_t i = 0; i < car.trunk_items_.size(); ++i) {
+                os << car.trunk_items_[i];
+                if (i < car.trunk_items_.size() - 1) {
+                    os << ",";
+                }
             }
         }
-        std::cout << "========================" << std::endl;
+
+        os << ")]";
+        return os;
     }
 
 } 
