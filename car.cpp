@@ -2,15 +2,15 @@
 
 namespace mt {
 
-    // проверка гос номера 
+    // РїСЂРѕРІРµСЂРєР° РіРѕСЃ РЅРѕРјРµСЂР° 
     bool Car::check_license_format_(const std::string& plate) const {
         if (plate.length() != 6) {
             return false;
         }
 
-        std::string allowed_letters = "АВЕКМНОРСТУХ";
+        std::string allowed_letters = "РђР’Р•РљРњРќРћР РЎРўРЈРҐ";
 
-        // первый символ должен быть буква из списка
+        // РїРµСЂРІС‹Р№ СЃРёРјРІРѕР» РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ Р±СѓРєРІР° РёР· СЃРїРёСЃРєР°
         bool first_ok = false;
         for (char letter : allowed_letters) {
             if (plate[0] == letter) {
@@ -19,7 +19,7 @@ namespace mt {
             }
         }
 
-        // 2-4 символы должны быть цифры
+        // 2-4 СЃРёРјРІРѕР»С‹ РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ С†РёС„СЂС‹
         bool digits_ok = true;
         for (int i = 1; i <= 3; i++) {
             if (plate[i] < '0' || plate[i] > '9') {
@@ -28,7 +28,7 @@ namespace mt {
             }
         }
 
-        // 5-6 символы должны быть буквы из списка
+        // 5-6 СЃРёРјРІРѕР»С‹ РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ Р±СѓРєРІС‹ РёР· СЃРїРёСЃРєР°
         bool last_ok = false;
         for (char letter1 : allowed_letters) {
             for (char letter2 : allowed_letters) {
@@ -43,17 +43,17 @@ namespace mt {
         return first_ok && digits_ok && last_ok;
     }
 
-    // конструктор по умолчанию
-    Car::Car() : brand_("Неизвестно"), model_("Неизвестно"),
-        body_number_("000000"), license_plate_("А000АА"),
+    // РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+    Car::Car() : brand_("РќРµРёР·РІРµСЃС‚РЅРѕ"), model_("РќРµРёР·РІРµСЃС‚РЅРѕ"),
+        body_number_("000000"), license_plate_("Рђ000РђРђ"),
         mileage_(0) {
 
         mileage_history_ = new std::vector<int>();
-        mileage_history_->push_back(0); // начальный пробег
-        std::cerr << "Вызван конструктор по умолчанию" << std::endl;
+        mileage_history_->push_back(0); // РЅР°С‡Р°Р»СЊРЅС‹Р№ РїСЂРѕР±РµРі
+        std::cerr << "Р’С‹Р·РІР°РЅ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ" << std::endl;
     }
 
-    // конструктор полного заполнения
+    // РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РїРѕР»РЅРѕРіРѕ Р·Р°РїРѕР»РЅРµРЅРёСЏ
     Car::Car(const std::string& brand, const std::string& model,
         const std::string& body_number, const std::string& license_plate,
         int mileage) :
@@ -61,42 +61,42 @@ namespace mt {
         license_plate_(license_plate), mileage_(mileage) {
 
         if (!is_mileage_valid_(mileage)) {
-            throw std::invalid_argument("Пробег должен быть неотрицательным");
+            throw std::invalid_argument("РџСЂРѕР±РµРі РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ РЅРµРѕС‚СЂРёС†Р°С‚РµР»СЊРЅС‹Рј");
         }
 
-        // проверка гос номера
+        // РїСЂРѕРІРµСЂРєР° РіРѕСЃ РЅРѕРјРµСЂР°
         if (!check_license_format_(license_plate)) {
             throw std::invalid_argument(
-                "Гос. номер должен быть в формате: БУКВА + 3 ЦИФРЫ + 2 БУКВЫ\n"
-                "Разрешенные буквы: А, В, Е, К, М, Н, О, Р, С, Т, У, Х\n"
-                "Пример: А123ВС, М456ОР, Х789ТУ");
+                "Р“РѕСЃ. РЅРѕРјРµСЂ РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ РІ С„РѕСЂРјР°С‚Рµ: Р‘РЈРљР’Рђ + 3 Р¦РР¤Р Р« + 2 Р‘РЈРљР’Р«\n"
+                "Р Р°Р·СЂРµС€РµРЅРЅС‹Рµ Р±СѓРєРІС‹: Рђ, Р’, Р•, Рљ, Рњ, Рќ, Рћ, Р , РЎ, Рў, РЈ, РҐ\n"
+                "РџСЂРёРјРµСЂ: Рђ123Р’РЎ, Рњ456РћР , РҐ789РўРЈ");
         }
 
         mileage_history_ = new std::vector<int>();
-        mileage_history_->push_back(mileage); // начальный пробег
+        mileage_history_->push_back(mileage); // РЅР°С‡Р°Р»СЊРЅС‹Р№ РїСЂРѕР±РµРі
 
-        std::cerr << "Вызван конструктор с параметрами" << std::endl;
+        std::cerr << "Р’С‹Р·РІР°РЅ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ СЃ РїР°СЂР°РјРµС‚СЂР°РјРё" << std::endl;
         show_protected_info_();
     }
 
-    // конструктор копирования
+    // РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РєРѕРїРёСЂРѕРІР°РЅРёСЏ
     Car::Car(const Car& other) :
         brand_(other.brand_), model_(other.model_),
         body_number_(other.body_number_),
         license_plate_(other.license_plate_),
         mileage_(other.mileage_) {
 
-        // глубокое копирование динамического поля
+        // РіР»СѓР±РѕРєРѕРµ РєРѕРїРёСЂРѕРІР°РЅРёРµ РґРёРЅР°РјРёС‡РµСЃРєРѕРіРѕ РїРѕР»СЏ
         mileage_history_ = new std::vector<int>(*other.mileage_history_);
 
-        std::cerr << "Вызван конструктор копирования" << std::endl;
+        std::cerr << "Р’С‹Р·РІР°РЅ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РєРѕРїРёСЂРѕРІР°РЅРёСЏ" << std::endl;
     }
 
-    // оператор присваивания
+    // РѕРїРµСЂР°С‚РѕСЂ РїСЂРёСЃРІР°РёРІР°РЅРёСЏ
     Car& Car::operator=(const Car& other) {
-        std::cerr << "Вызван оператор присваивания" << std::endl;
+        std::cerr << "Р’С‹Р·РІР°РЅ РѕРїРµСЂР°С‚РѕСЂ РїСЂРёСЃРІР°РёРІР°РЅРёСЏ" << std::endl;
 
-        if (this != &other) { // защита от самоприсваивания
+        if (this != &other) { // Р·Р°С‰РёС‚Р° РѕС‚ СЃР°РјРѕРїСЂРёСЃРІР°РёРІР°РЅРёСЏ
             brand_ = other.brand_;
             model_ = other.model_;
             body_number_ = other.body_number_;
@@ -111,108 +111,108 @@ namespace mt {
         return *this;
     }
 
-    // деструктор
+    // РґРµСЃС‚СЂСѓРєС‚РѕСЂ
     Car::~Car() {
-        // Очистка динамического поля перед выводом сообщения
+        // РћС‡РёСЃС‚РєР° РґРёРЅР°РјРёС‡РµСЃРєРѕРіРѕ РїРѕР»СЏ РїРµСЂРµРґ РІС‹РІРѕРґРѕРј СЃРѕРѕР±С‰РµРЅРёСЏ
         if (mileage_history_ != nullptr) {
-            mileage_history_->clear(); // очистка вектора
-            delete mileage_history_;   // освобождение памяти
+            mileage_history_->clear(); // РѕС‡РёСЃС‚РєР° РІРµРєС‚РѕСЂР°
+            delete mileage_history_;   // РѕСЃРІРѕР±РѕР¶РґРµРЅРёРµ РїР°РјСЏС‚Рё
             mileage_history_ = nullptr;
         }
 
-        std::cerr << "Вызван деструктор для " << brand_ << " " << model_ << std::endl;
+        std::cerr << "Р’С‹Р·РІР°РЅ РґРµСЃС‚СЂСѓРєС‚РѕСЂ РґР»СЏ " << brand_ << " " << model_ << std::endl;
     }
 
-    // сеттер для номера кузова
+    // СЃРµС‚С‚РµСЂ РґР»СЏ РЅРѕРјРµСЂР° РєСѓР·РѕРІР°
     void Car::set_body_number(const std::string& body_number) {
         body_number_ = body_number;
     }
 
-    // сеттер для гос. номера с проверкой 
+    // СЃРµС‚С‚РµСЂ РґР»СЏ РіРѕСЃ. РЅРѕРјРµСЂР° СЃ РїСЂРѕРІРµСЂРєРѕР№ 
     void Car::set_license_plate(const std::string& license_plate) {
         if (!check_license_format_(license_plate)) {
             throw std::invalid_argument(
-                "Гос. номер должен быть в формате: БУКВА + 3 ЦИФРЫ + 2 БУКВЫ\n"
-                "Разрешенные буквы: А, В, Е, К, М, Н, О, Р, С, Т, У, Х\n"
-                "Пример: А123ВС, М456ОР, Х789ТУ");
+                "Р“РѕСЃ. РЅРѕРјРµСЂ РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ РІ С„РѕСЂРјР°С‚Рµ: Р‘РЈРљР’Рђ + 3 Р¦РР¤Р Р« + 2 Р‘РЈРљР’Р«\n"
+                "Р Р°Р·СЂРµС€РµРЅРЅС‹Рµ Р±СѓРєРІС‹: Рђ, Р’, Р•, Рљ, Рњ, Рќ, Рћ, Р , РЎ, Рў, РЈ, РҐ\n"
+                "РџСЂРёРјРµСЂ: Рђ123Р’РЎ, Рњ456РћР , РҐ789РўРЈ");
         }
 
         license_plate_ = license_plate;
-        std::cout << "Гос. номер успешно изменен на: " << license_plate_ << std::endl;
+        std::cout << "Р“РѕСЃ. РЅРѕРјРµСЂ СѓСЃРїРµС€РЅРѕ РёР·РјРµРЅРµРЅ РЅР°: " << license_plate_ << std::endl;
     }
 
-    // метод для вывода всей информации
+    // РјРµС‚РѕРґ РґР»СЏ РІС‹РІРѕРґР° РІСЃРµР№ РёРЅС„РѕСЂРјР°С†РёРё
     void Car::print_info() const {
-        std::cout << "=== Информация об автомобиле ===" << std::endl;
-        std::cout << "Марка: " << brand_ << std::endl;
-        std::cout << "Модель: " << model_ << std::endl;
-        std::cout << "Номер кузова: " << body_number_ << std::endl;
-        std::cout << "Гос. номер: " << license_plate_ << std::endl;
-        std::cout << "Пробег: " << mileage_ << " км" << std::endl;
+        std::cout << "=== РРЅС„РѕСЂРјР°С†РёСЏ РѕР± Р°РІС‚РѕРјРѕР±РёР»Рµ ===" << std::endl;
+        std::cout << "РњР°СЂРєР°: " << brand_ << std::endl;
+        std::cout << "РњРѕРґРµР»СЊ: " << model_ << std::endl;
+        std::cout << "РќРѕРјРµСЂ РєСѓР·РѕРІР°: " << body_number_ << std::endl;
+        std::cout << "Р“РѕСЃ. РЅРѕРјРµСЂ: " << license_plate_ << std::endl;
+        std::cout << "РџСЂРѕР±РµРі: " << mileage_ << " РєРј" << std::endl;
         std::cout << "================================" << std::endl;
     }
 
-    // метод для скручивания пробега на X
+    // РјРµС‚РѕРґ РґР»СЏ СЃРєСЂСѓС‡РёРІР°РЅРёСЏ РїСЂРѕР±РµРіР° РЅР° X
     void Car::rollback_mileage(int x) {
         if (x < 0) {
-            throw std::invalid_argument("Значение скручивания должно быть неотрицательным");
+            throw std::invalid_argument("Р—РЅР°С‡РµРЅРёРµ СЃРєСЂСѓС‡РёРІР°РЅРёСЏ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РЅРµРѕС‚СЂРёС†Р°С‚РµР»СЊРЅС‹Рј");
         }
 
         if (mileage_ - x < 0) {
-            throw std::invalid_argument("Нельзя скрутить больше, чем текущий пробег");
+            throw std::invalid_argument("РќРµР»СЊР·СЏ СЃРєСЂСѓС‚РёС‚СЊ Р±РѕР»СЊС€Рµ, С‡РµРј С‚РµРєСѓС‰РёР№ РїСЂРѕР±РµРі");
         }
 
         mileage_ -= x;
-        mileage_history_->push_back(mileage_); // в историю
-        std::cout << "Пробег уменьшен на " << x << " км" << std::endl;
+        mileage_history_->push_back(mileage_); // РІ РёСЃС‚РѕСЂРёСЋ
+        std::cout << "РџСЂРѕР±РµРі СѓРјРµРЅСЊС€РµРЅ РЅР° " << x << " РєРј" << std::endl;
     }
 
-    // метод для увеличения пробега
+    // РјРµС‚РѕРґ РґР»СЏ СѓРІРµР»РёС‡РµРЅРёСЏ РїСЂРѕР±РµРіР°
     void Car::drive(int distance) {
         if (distance < 0) {
-            throw std::invalid_argument("Расстояние должно быть неотрицательным");
+            throw std::invalid_argument("Р Р°СЃСЃС‚РѕСЏРЅРёРµ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РЅРµРѕС‚СЂРёС†Р°С‚РµР»СЊРЅС‹Рј");
         }
         mileage_ += distance;
-        mileage_history_->push_back(mileage_); // в историю
-        std::cout << "Автомобиль проехал " << distance << " км" << std::endl;
+        mileage_history_->push_back(mileage_); // РІ РёСЃС‚РѕСЂРёСЋ
+        std::cout << "РђРІС‚РѕРјРѕР±РёР»СЊ РїСЂРѕРµС…Р°Р» " << distance << " РєРј" << std::endl;
     }
 
-    // оператор сравнения == по гос номеру
+    // РѕРїРµСЂР°С‚РѕСЂ СЃСЂР°РІРЅРµРЅРёСЏ == РїРѕ РіРѕСЃ РЅРѕРјРµСЂСѓ
     bool Car::operator==(const Car& other) const {
         return license_plate_ == other.license_plate_;
     }
 
-    // оператор сравнения !=
+    // РѕРїРµСЂР°С‚РѕСЂ СЃСЂР°РІРЅРµРЅРёСЏ !=
     bool Car::operator!=(const Car& other) const {
         return !(*this == other);
     }
 
-    // оператор вывода в поток
+    // РѕРїРµСЂР°С‚РѕСЂ РІС‹РІРѕРґР° РІ РїРѕС‚РѕРє
     std::ostream& operator<<(std::ostream& os, const Car& car) {
         os << car.brand_ << " " << car.model_ << " (" << car.license_plate_ << ") - "
-            << car.mileage_ << " км";
+            << car.mileage_ << " РєРј";
         return os;
     }
 
-    // публичные методы для работы с protected данными
+    // РїСѓР±Р»РёС‡РЅС‹Рµ РјРµС‚РѕРґС‹ РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ protected РґР°РЅРЅС‹РјРё
     void Car::set_color(const std::string& color) {
         car_color_ = color;
-        std::cout << "Цвет автомобиля установлен: " << car_color_ << std::endl;
+        std::cout << "Р¦РІРµС‚ Р°РІС‚РѕРјРѕР±РёР»СЏ СѓСЃС‚Р°РЅРѕРІР»РµРЅ: " << car_color_ << std::endl;
     }
 
     void Car::show_color() const {
-        std::cout << "Цвет автомобиля: " << car_color_ << std::endl;
+        std::cout << "Р¦РІРµС‚ Р°РІС‚РѕРјРѕР±РёР»СЏ: " << car_color_ << std::endl;
     }
 
-    // метод для отображения истории пробегов
+    // РјРµС‚РѕРґ РґР»СЏ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ РёСЃС‚РѕСЂРёРё РїСЂРѕР±РµРіРѕРІ
     void Car::show_mileage_history() const {
-        std::cout << "=== История пробегов ===" << std::endl;
+        std::cout << "=== РСЃС‚РѕСЂРёСЏ РїСЂРѕР±РµРіРѕРІ ===" << std::endl;
         if (mileage_history_ == nullptr || mileage_history_->empty()) {
-            std::cout << "История пуста" << std::endl;
+            std::cout << "РСЃС‚РѕСЂРёСЏ РїСѓСЃС‚Р°" << std::endl;
         }
         else {
             for (size_t i = 0; i < mileage_history_->size(); ++i) {
-                std::cout << "Запись " << (i + 1) << ": " << (*mileage_history_)[i] << " км" << std::endl;
+                std::cout << "Р—Р°РїРёСЃСЊ " << (i + 1) << ": " << (*mileage_history_)[i] << " РєРј" << std::endl;
             }
         }
         std::cout << "========================" << std::endl;
