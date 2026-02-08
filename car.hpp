@@ -16,42 +16,42 @@ namespace mt {
         std::string license_plate_;
         int mileage_;
 
-        // динамическое поле для истории пробегов
+        // РґРёРЅР°РјРёС‡РµСЃРєРѕРµ РїРѕР»Рµ РґР»СЏ РёСЃС‚РѕСЂРёРё РїСЂРѕР±РµРіРѕРІ
         std::vector<int>* mileage_history_;
 
         bool is_mileage_valid_(int mileage) const {
             return mileage >= 0;
         }
 
-        // проверка гос номера 
+        // РїСЂРѕРІРµСЂРєР° РіРѕСЃ РЅРѕРјРµСЂР° 
         bool check_license_format_(const std::string& plate) const;
 
     protected:
         void show_protected_info_() const {
-            std::cout << "[Protected доступ] Марка авто: " << brand_ << std::endl;
+            std::cout << "[Protected РґРѕСЃС‚СѓРї] РњР°СЂРєР° Р°РІС‚Рѕ: " << brand_ << std::endl;
         }
 
-        std::string car_color_ = "Не указан";
+        std::string car_color_ = "РќРµ СѓРєР°Р·Р°РЅ";
 
     public:
-        // конструктор по умолчанию
+        // РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
         Car();
 
-        // конструктор полного заполнения
+        // РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РїРѕР»РЅРѕРіРѕ Р·Р°РїРѕР»РЅРµРЅРёСЏ
         Car(const std::string& brand, const std::string& model,
             const std::string& body_number, const std::string& license_plate,
             int mileage);
 
-        // конструктор копирования 
+        // РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РєРѕРїРёСЂРѕРІР°РЅРёСЏ 
         Car(const Car& other);
 
-        // оператор присваивания 
+        // РѕРїРµСЂР°С‚РѕСЂ РїСЂРёСЃРІР°РёРІР°РЅРёСЏ 
         Car& operator=(const Car& other);
 
-        // деструктор 
+        // РґРµСЃС‚СЂСѓРєС‚РѕСЂ 
         ~Car();
 
-        // геттеры на все поля
+        // РіРµС‚С‚РµСЂС‹ РЅР° РІСЃРµ РїРѕР»СЏ
         std::string get_brand() const { return brand_; }
         std::string get_model() const { return model_; }
         std::string get_body_number() const { return body_number_; }
@@ -59,35 +59,35 @@ namespace mt {
         int get_mileage() const { return mileage_; }
         const std::vector<int>* get_mileage_history() const { return mileage_history_; }
 
-        // сеттер для номера кузова 
+        // СЃРµС‚С‚РµСЂ РґР»СЏ РЅРѕРјРµСЂР° РєСѓР·РѕРІР° 
         void set_body_number(const std::string& body_number);
 
-        // сеттер для гос. номера с проверкой 
+        // СЃРµС‚С‚РµСЂ РґР»СЏ РіРѕСЃ. РЅРѕРјРµСЂР° СЃ РїСЂРѕРІРµСЂРєРѕР№ 
         void set_license_plate(const std::string& license_plate);
 
-        // метод для вывода всей информации 
+        // РјРµС‚РѕРґ РґР»СЏ РІС‹РІРѕРґР° РІСЃРµР№ РёРЅС„РѕСЂРјР°С†РёРё 
         void print_info() const;
 
-        // метод для скручивания пробега на X 
+        // РјРµС‚РѕРґ РґР»СЏ СЃРєСЂСѓС‡РёРІР°РЅРёСЏ РїСЂРѕР±РµРіР° РЅР° X 
         void rollback_mileage(int x);
 
-        // метод для увеличения пробега 
+        // РјРµС‚РѕРґ РґР»СЏ СѓРІРµР»РёС‡РµРЅРёСЏ РїСЂРѕР±РµРіР° 
         void drive(int distance);
 
-        // оператор сравнения == по гос номеру
+        // РѕРїРµСЂР°С‚РѕСЂ СЃСЂР°РІРЅРµРЅРёСЏ == РїРѕ РіРѕСЃ РЅРѕРјРµСЂСѓ
         bool operator==(const Car& other) const;
 
-        // оператор сравнения !=
+        // РѕРїРµСЂР°С‚РѕСЂ СЃСЂР°РІРЅРµРЅРёСЏ !=
         bool operator!=(const Car& other) const;
 
-        // оператор вывода в поток
+        // РѕРїРµСЂР°С‚РѕСЂ РІС‹РІРѕРґР° РІ РїРѕС‚РѕРє
         friend std::ostream& operator<<(std::ostream& os, const Car& car);
 
-        // публичные методы для работы с protected данными
+        // РїСѓР±Р»РёС‡РЅС‹Рµ РјРµС‚РѕРґС‹ РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ protected РґР°РЅРЅС‹РјРё
         void set_color(const std::string& color);
         void show_color() const;
 
-        // метод для отображения истории пробегов
+        // РјРµС‚РѕРґ РґР»СЏ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ РёСЃС‚РѕСЂРёРё РїСЂРѕР±РµРіРѕРІ
         void show_mileage_history() const;
     };
 
