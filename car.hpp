@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include <algorithm>
 #include <random>
+#include <chrono>
 
 namespace mt {
 
@@ -15,13 +16,18 @@ namespace mt {
         std::string brand_;
         std::string model_;
         std::string license_plate_;
-        std::vector<std::string> trunk_items_;  // вещи в багажнике
+
+        // указатель на вектор вещей в багажнике
+        std::vector<std::string>* trunk_items_;
 
         // проверка гос номера
         bool check_license_format_(const std::string& plate) const;
 
         // генерация случайного госномера
         std::string generate_random_plate_() const;
+
+        // вспомогательный метод для группировки повторов
+        void group_duplicates_(std::vector<std::string>& items) const;
 
     public:
         // конструктор по умолчанию
@@ -45,7 +51,11 @@ namespace mt {
         std::string get_brand() const { return brand_; }
         std::string get_model() const { return model_; }
         std::string get_license_plate() const { return license_plate_; }
-        std::vector<std::string> get_trunk_items() const { return trunk_items_; }
+
+        // геттер для вектора 
+        std::vector<std::string> get_trunk_items() const {
+            return *trunk_items_;
+        }
 
         // сеттер для гос. номера с проверкой
         void set_license_plate(const std::string& license_plate);
@@ -78,6 +88,6 @@ namespace mt {
         friend std::ostream& operator<<(std::ostream& os, const Car& car);
     };
 
-}
+} // namespace mt
 
 #endif // CAR_HPP
